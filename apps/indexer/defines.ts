@@ -26,4 +26,10 @@ export interface WalletAnalysis {
     categories: { [category: string]: number };
     nftActivity: { listings: number, purchases: number };
     lastActivityTimestamp: number;
-}
+    totalTransactions: number;
+    mostUsedProgram: string;
+    mostFrequentInteraction: string;
+    activityPeriod: { start: number; end: number };
+    programFrequency: { [program: string]: number };
+    averageTransactionsPerDay: number;
+  }

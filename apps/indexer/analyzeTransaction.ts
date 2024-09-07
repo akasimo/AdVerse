@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { SimplifiedTransaction, WalletAnalysis } from './defines';
+import { printAnalysis } from './utils';
 
 async function loadJsonFile(filename: string): Promise<SimplifiedTransaction[]> {
   const filePath = path.join(__dirname, filename);
@@ -17,13 +18,25 @@ function analyzeTransactions(transactions: SimplifiedTransaction[], ownerWalletA
     interactionTypes: {},
     categories: {},
     nftActivity: { listings: 0, purchases: 0 },
-    lastActivityTimestamp: 0
+    lastActivityTimestamp: 0,
+    totalTransactions: filteredTransactions.length,
+    mostUsedProgram: '',
+    mostFrequentInteraction: '',
+    activityPeriod: { start: Infinity, end: 0 },
+    programFrequency: {},
+    averageTransactionsPerDay: 0,
   };
+
+  const programFirstLast: { [program: string]: { first: number, last: number } } = {};
 
   filteredTransactions.forEach(tx => {
     // Program List and Usage
     if (!analysis.programList.includes(tx.source)) {
       analysis.programList.push(tx.source);
+      programFirstLast[tx.source] = { first: tx.timestamp, last: tx.timestamp };
+    } else {
+      programFirstLast[tx.source].first = Math.min(programFirstLast[tx.source].first, tx.timestamp);
+      programFirstLast[tx.source].last = Math.max(programFirstLast[tx.source].last, tx.timestamp);
     }
     analysis.programUsage[tx.source] = (analysis.programUsage[tx.source] || 0) + 1;
 
@@ -42,18 +55,31 @@ function analyzeTransactions(transactions: SimplifiedTransaction[], ownerWalletA
 
     // Last Activity Timestamp
     analysis.lastActivityTimestamp = Math.max(analysis.lastActivityTimestamp, tx.timestamp);
+
+    // Activity period
+    analysis.activityPeriod.start = Math.min(analysis.activityPeriod.start, tx.timestamp);
+    analysis.activityPeriod.end = Math.max(analysis.activityPeriod.end, tx.timestamp);
   });
 
-  return analysis;
-}
+  // Calculate program frequency (uses per day)
+  for (const program of analysis.programList) {
+    const usage = analysis.programUsage[program];
+    const timeSpan = programFirstLast[program].last - programFirstLast[program].first;
+    const daysBetween = timeSpan / (24 * 60 * 60) + 1; // Add 1 to include both first and last day
+    analysis.programFrequency[program] = Number((usage / daysBetween).toFixed(3));
+  }
 
-function printAnalysis(analysis: WalletAnalysis) {
-  console.log('Program List:', analysis.programList);
-  console.log('Program Usage:', analysis.programUsage);
-  console.log('Interaction Types:', analysis.interactionTypes);
-  console.log('Categories:', analysis.categories);
-  console.log('NFT Activity:', analysis.nftActivity);
-  console.log('Last Activity:', new Date(analysis.lastActivityTimestamp * 1000).toISOString());
+  // Calculate average transactions per day
+  const totalDaysBetween = (analysis.activityPeriod.end - analysis.activityPeriod.start) / (24 * 60 * 60) + 1;
+  analysis.averageTransactionsPerDay = Number((analysis.totalTransactions / totalDaysBetween).toFixed(3));
+
+  // Determine most used program and most frequent interaction
+  analysis.mostUsedProgram = Object.entries(analysis.programUsage).reduce((a, b) => a[1] > b[1] ? a : b)[0];
+  analysis.mostFrequentInteraction = Object.entries(analysis.interactionTypes)
+    .filter(([key]) => key !== 'UNKNOWN')
+    .reduce((a, b) => a[1] > b[1] ? a : b, ['', 0])[0];
+
+  return analysis;
 }
 
 async function main() {
@@ -65,6 +91,7 @@ async function main() {
     console.log(`Total transactions in JSON: ${transactions.length}`);
 
     const analysis = analyzeTransactions(transactions, ownerWalletAddress);
+    // console.log(analysis);
     printAnalysis(analysis);
   } catch (error) {
     console.error('Error analyzing transactions:', error);
