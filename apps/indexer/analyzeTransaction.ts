@@ -9,7 +9,7 @@ async function loadJsonFile(filename: string): Promise<SimplifiedTransaction[]> 
   return JSON.parse(fileContent);
 }
 
-function analyzeTransactions(transactions: SimplifiedTransaction[], ownerWalletAddress: string): WalletAnalysis {
+function analyzeTransactions(transactions: SimplifiedTransaction[], ownerWalletAddress: string): [WalletAnalysis, string] {
   const filteredTransactions = transactions.filter(tx => tx.feePayer === ownerWalletAddress);
   
   const analysis: WalletAnalysis = {
@@ -122,7 +122,18 @@ function analyzeTransactions(transactions: SimplifiedTransaction[], ownerWalletA
     analysis.userTags.push('Low Activity');
   }
 
-  return analysis;
+  // New code for description analysis
+  const descriptionMap: { [key: string]: number } = {};
+  transactions.forEach(tx => {
+    const description = tx.description.split(' ').slice(1).join(' ');
+    descriptionMap[description] = (descriptionMap[description] || 0) + 1;
+  });
+
+  const combinedDescriptions = Object.entries(descriptionMap)
+    .map(([desc, count]) => `${desc}${count > 1 ? ` (done ${count} times)` : ''}`)
+    .join('\n');
+
+  return [analysis, combinedDescriptions];
 }
 
 async function writeAnalysisToFile(analysis: WalletAnalysis, walletAddress: string) {
@@ -132,7 +143,16 @@ async function writeAnalysisToFile(analysis: WalletAnalysis, walletAddress: stri
     console.log(`Analysis written to ${fileName}`);
 }
 
+async function writeDescriptionsToFile(descriptions: string, walletAddress: string) {
+  const fileName = `descriptions_${walletAddress}.txt`;
+  const filePath = path.join(__dirname, fileName);
+  await fs.writeFile(filePath, descriptions);
+  console.log(`Descriptions written to ${fileName}`);
+}
+
 async function main() {
+//   const jsonFilename = 'transactions_D3HaM2LdkdRGZUQcFvVeaEvgC3NTPFyFXRdSeFmsT52G.json';
+//   const ownerWalletAddress = 'D3HaM2LdkdRGZUQcFvVeaEvgC3NTPFyFXRdSeFmsT52G';
   const jsonFilename = 'transactions_8SKisd77dkXDxbHmhQbrkp6mjnKcwL5hYPqh9Yr8isvh.json';
   const ownerWalletAddress = '8SKisd77dkXDxbHmhQbrkp6mjnKcwL5hYPqh9Yr8isvh';
 
@@ -140,10 +160,10 @@ async function main() {
     const transactions = await loadJsonFile(jsonFilename);
     console.log(`Total transactions in JSON: ${transactions.length}`);
 
-    const analysis = analyzeTransactions(transactions, ownerWalletAddress);
-    // console.log(analysis);
+    const [analysis, combinedDescriptions] = analyzeTransactions(transactions, ownerWalletAddress);
     printAnalysis(analysis);
     await writeAnalysisToFile(analysis, ownerWalletAddress);
+    await writeDescriptionsToFile(combinedDescriptions, ownerWalletAddress);
 
   } catch (error) {
     console.error('Error analyzing transactions:', error);
