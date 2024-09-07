@@ -68,18 +68,7 @@ async function saveToJsonFile(data: HeliusTransaction[], filename: string): Prom
   console.log(`Data saved to ${filePath}`);
 }
 
-
-// Usage example
-async function main() {
-  const apiKey = process.env.HELIUS_API_KEY;
-  if (!apiKey) {
-    throw new Error('HELIUS_API_KEY is not defined in the .env file');
-  }
-
-  const indexer = new SolanaIndexer(apiKey);
-  
-  const walletAddress = '8SKisd77dkXDxbHmhQbrkp6mjnKcwL5hYPqh9Yr8isvh';
-  
+async function processWalletTransactions(indexer: SolanaIndexer, walletAddress: string): Promise<void> {
   try {
     const transactions = await indexer.getLastTransactions(walletAddress);
     console.log(`Retrieved ${transactions.length} transactions for wallet ${walletAddress}`);
@@ -92,8 +81,21 @@ async function main() {
       console.log(`Transaction ${index + 1}:`, tx.signature);
     });
   } catch (error) {
-    console.error('Error in main:', error);
+    console.error(`Error processing transactions for wallet ${walletAddress}:`, error);
   }
+}
+
+async function main() {
+  const apiKey = process.env.HELIUS_API_KEY;
+  if (!apiKey) {
+    throw new Error('HELIUS_API_KEY is not defined in the .env file');
+  }
+
+  const indexer = new SolanaIndexer(apiKey);
+  
+  const walletAddress = '8SKisd77dkXDxbHmhQbrkp6mjnKcwL5hYPqh9Yr8isvh';
+  
+  await processWalletTransactions(indexer, walletAddress);
 }
 
 main();
