@@ -2,31 +2,11 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 import fs from 'fs/promises';
 import path from 'path';
-
+import { HeliusTransaction, SimplifiedTransaction } from './defines';
 // Load environment variables from .env file
 dotenv.config();
 
-interface HeliusTransaction {
-  description: string;
-  type: string;
-  source: string;
-  fee: number;
-  feePayer: string;
-  signature: string;
-  slot: number;
-  timestamp: number;
-  // Add other fields as needed
-}
-
-interface SimplifiedTransaction {
-  description: string;
-  type: string;
-  source: string;
-  feePayer: string;
-  signature: string;
-  slot: number;
-  timestamp: number;
-}
+const MAX_BATCHES = 5; // Define the maximum number of batches to fetch
 
 class SolanaIndexer {
   private apiKey: string;
@@ -38,17 +18,38 @@ class SolanaIndexer {
     // this.baseUrl = 'https://api.helius.xyz/v0';
   }
 
-  async getLastTransactions(walletAddress: string, limit: number = 100): Promise<HeliusTransaction[]> {
-    try {
-      const url = `${this.baseUrl}/addresses/${walletAddress}/transactions?api-key=${this.apiKey}&limit=${limit}`;
-      console.log(url);
-      // throw new Error('test'); 
-      const response = await axios.get(url);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching transactions:', error);
-      throw error;
+  async getAllTransactions(walletAddress: string, limit: number = 100): Promise<HeliusTransaction[]> {
+    let allTransactions: HeliusTransaction[] = [];
+    let lastSignature: string | null = null;
+    let batchCount = 0;
+
+    while (batchCount < MAX_BATCHES) {
+      try {
+        let url = `${this.baseUrl}/addresses/${walletAddress}/transactions?api-key=${this.apiKey}&limit=${limit}`;
+        if (lastSignature) {
+          url += `&before=${lastSignature}`;
+        }
+
+        const response = await axios.get(url);
+        const transactions: HeliusTransaction[] = response.data;
+
+        if (transactions.length === 0) {
+          console.log("No more transactions available.");
+          break;
+        }
+
+        allTransactions = allTransactions.concat(transactions);
+        lastSignature = transactions[transactions.length - 1].signature;
+        batchCount++;
+
+        console.log(`Fetched batch ${batchCount} (${transactions.length} transactions)`);
+      } catch (error) {
+        console.error('Error fetching transactions:', error);
+        throw error;
+      }
     }
+
+    return allTransactions;
   }
 }
 
@@ -70,7 +71,7 @@ async function saveToJsonFile(data: HeliusTransaction[], filename: string): Prom
 
 async function processWalletTransactions(indexer: SolanaIndexer, walletAddress: string): Promise<void> {
   try {
-    const transactions = await indexer.getLastTransactions(walletAddress);
+    const transactions = await indexer.getAllTransactions(walletAddress);
     console.log(`Retrieved ${transactions.length} transactions for wallet ${walletAddress}`);
     
     // Save transactions to a JSON file
