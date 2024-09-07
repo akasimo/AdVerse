@@ -18,20 +18,31 @@ interface HeliusTransaction {
   // Add other fields as needed
 }
 
+interface SimplifiedTransaction {
+  description: string;
+  type: string;
+  source: string;
+  feePayer: string;
+  signature: string;
+  slot: number;
+  timestamp: number;
+}
+
 class SolanaIndexer {
   private apiKey: string;
   private baseUrl: string;
 
   constructor(apiKey: string) {
     this.apiKey = apiKey;
-    this.baseUrl = 'https://api.helius.xyz/v0';
+    this.baseUrl = 'https://api-mainnet.helius-rpc.com/v0';
+    // this.baseUrl = 'https://api.helius.xyz/v0';
   }
 
   async getLastTransactions(walletAddress: string, limit: number = 100): Promise<HeliusTransaction[]> {
     try {
       const url = `${this.baseUrl}/addresses/${walletAddress}/transactions?api-key=${this.apiKey}&limit=${limit}`;
       console.log(url);
-      throw new Error('test'); 
+      // throw new Error('test'); 
       const response = await axios.get(url);
       return response.data;
     } catch (error) {
@@ -41,11 +52,22 @@ class SolanaIndexer {
   }
 }
 
-async function saveToJsonFile(data: any, filename: string): Promise<void> {
+async function saveToJsonFile(data: HeliusTransaction[], filename: string): Promise<void> {
+  const simplifiedData: SimplifiedTransaction[] = data.map(tx => ({
+    description: tx.description,
+    type: tx.type,
+    source: tx.source,
+    feePayer: tx.feePayer,
+    signature: tx.signature,
+    slot: tx.slot,
+    timestamp: tx.timestamp,
+  }));
+
   const filePath = path.join(__dirname, filename);
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+  await fs.writeFile(filePath, JSON.stringify(simplifiedData, null, 2));
   console.log(`Data saved to ${filePath}`);
 }
+
 
 // Usage example
 async function main() {
@@ -56,7 +78,7 @@ async function main() {
 
   const indexer = new SolanaIndexer(apiKey);
   
-  const walletAddress = '5LTWnNEBtprPvfjsmaKMYLU48FgVv9UvC4SzLJgDr25x';
+  const walletAddress = '8SKisd77dkXDxbHmhQbrkp6mjnKcwL5hYPqh9Yr8isvh';
   
   try {
     const transactions = await indexer.getLastTransactions(walletAddress);
