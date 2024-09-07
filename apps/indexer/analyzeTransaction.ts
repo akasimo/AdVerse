@@ -13,6 +13,7 @@ function analyzeTransactions(transactions: SimplifiedTransaction[], ownerWalletA
   const filteredTransactions = transactions.filter(tx => tx.feePayer === ownerWalletAddress);
   
   const analysis: WalletAnalysis = {
+    walletAddress: ownerWalletAddress,
     programList: [],
     programUsage: {},
     interactionTypes: {},
@@ -25,6 +26,10 @@ function analyzeTransactions(transactions: SimplifiedTransaction[], ownerWalletA
     activityPeriod: { start: Infinity, end: 0 },
     programFrequency: {},
     averageTransactionsPerDay: 0,
+    riskLevel: 'Unknown',
+    activityRecency: 'Unknown',
+    spendingBehavior: 'Unknown',
+    userTags: [],
   };
 
   const programFirstLast: { [program: string]: { first: number, last: number } } = {};
@@ -79,7 +84,52 @@ function analyzeTransactions(transactions: SimplifiedTransaction[], ownerWalletA
     .filter(([key]) => key !== 'UNKNOWN')
     .reduce((a, b) => a[1] > b[1] ? a : b, ['', 0])[0];
 
+  // Risk Level and Spending Behavior
+  const tradeFrequency = analysis.totalTransactions / totalDaysBetween;
+  if (tradeFrequency > 5) {
+    analysis.riskLevel = 'High';
+    analysis.spendingBehavior = 'High Spender';
+    analysis.userTags.push('Degen');
+  } else if (tradeFrequency > 1) {
+    analysis.riskLevel = 'Medium';
+    analysis.spendingBehavior = 'Moderate Spender';
+  } else {
+    analysis.riskLevel = 'Low';
+    analysis.spendingBehavior = 'Low Spender';
+    analysis.userTags.push('Normie');
+  }
+
+  // Activity Recency
+  const daysSinceLastActivity = (Date.now() / 1000 - analysis.lastActivityTimestamp) / (24 * 60 * 60);
+  if (daysSinceLastActivity < 1) {
+    analysis.activityRecency = 'Very Recent (Last 24 hours)';
+  } else if (daysSinceLastActivity < 7) {
+    analysis.activityRecency = 'Recent (Last Week)';
+  } else if (daysSinceLastActivity < 30) {
+    analysis.activityRecency = 'Moderate (Last Month)';
+  } else {
+    analysis.activityRecency = 'Inactive (Over a Month)';
+  }
+
+  // User Tags
+  if (analysis.categories['NFT'] && analysis.categories['NFT'] > 10) {
+    analysis.userTags.push('NFT Trader');
+  }
+  if (analysis.categories['DeFi'] && analysis.categories['DeFi'] > 5) {
+    analysis.userTags.push('DeFi Participant');
+  }
+  if (analysis.totalTransactions < 10 && totalDaysBetween > 30) {
+    analysis.userTags.push('Low Activity');
+  }
+
   return analysis;
+}
+
+async function writeAnalysisToFile(analysis: WalletAnalysis, walletAddress: string) {
+    const fileName = `analysis_${walletAddress}.json`;
+    const filePath = path.join(__dirname, fileName);
+    await fs.writeFile(filePath, JSON.stringify(analysis, null, 2));
+    console.log(`Analysis written to ${fileName}`);
 }
 
 async function main() {
@@ -93,6 +143,8 @@ async function main() {
     const analysis = analyzeTransactions(transactions, ownerWalletAddress);
     // console.log(analysis);
     printAnalysis(analysis);
+    await writeAnalysisToFile(analysis, ownerWalletAddress);
+
   } catch (error) {
     console.error('Error analyzing transactions:', error);
   }

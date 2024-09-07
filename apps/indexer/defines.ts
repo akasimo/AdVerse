@@ -20,6 +20,7 @@ export interface SimplifiedTransaction {
 }
   
 export interface WalletAnalysis {
+    walletAddress: string;
     programList: string[];
     programUsage: { [program: string]: number };
     interactionTypes: { [type: string]: number };
@@ -32,4 +33,8 @@ export interface WalletAnalysis {
     activityPeriod: { start: number; end: number };
     programFrequency: { [program: string]: number };
     averageTransactionsPerDay: number;
-  }
+    riskLevel: string;
+    activityRecency: string;
+    spendingBehavior: string;
+    userTags: string[];
+}

@@ -21,4 +21,9 @@ export function printAnalysis(analysis: WalletAnalysis) {
     for (const [program, frequency] of Object.entries(analysis.programFrequency)) {
       console.log(`  ${program}: ${frequency} times per day`);
     }
+
+    console.log('Risk Level:', analysis.riskLevel);
+    console.log('Spending Behavior:', analysis.spendingBehavior);
+    console.log('Activity Recency:', analysis.activityRecency);
+    console.log('User Tags:', analysis.userTags.join(', '));
   }
