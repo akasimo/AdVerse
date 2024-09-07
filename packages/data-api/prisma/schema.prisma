@@ -1,0 +1,56 @@
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+
+
+model TransactionDetail {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  description String
+  type        String
+  source      String
+  feePayer    String
+  walletAddress String
+  wallet Wallet @relation(fields: [walletAddress], references: [address])
+  signature   String
+  slot        Int
+  timestamp   Int
+}
+
+model AnalyzedTransaction {
+  id                     String              @id @default(auto()) @map("_id") @db.ObjectId
+  walletAddress          String              @unique
+  programList            String[]
+  programUsage           Json                // { "TENSOR": 260, "SYSTEM_PROGRAM": 62, ... }
+  interactionTypes       Json                // { "NFT_LISTING": 115, "TRANSFER": 62, ... }
+  categories             Json                // { "NFT": 117, "Other": 224, ... }
+  nftActivity            Json                // { "listings": 115, "purchases": 1 }
+  lastActivityTimestamp  Int
+  totalTransactions      Int
+  mostUsedProgram        String
+  mostFrequentInteraction String
+  activityPeriod         Json                // { "start": 1722368841, "end": 1725723095 }
+  programFrequency       Json                // { "TENSOR": 6.529, "SYSTEM_PROGRAM": 1.595, ... }
+  averageTransactionsPerDay Float
+  riskLevel              String
+  activityRecency        String
+  spendingBehavior       String
+  userTags               String[]
+  wallet                 Wallet  @relation(fields: [walletAddress], references: [address]) 
+}
+
+
+
+model Wallet {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  address     String       @unique
+  transactionDetail   TransactionDetail[] 
+  analyzedTransaction   AnalyzedTransaction[]
+}
