@@ -2,6 +2,10 @@ import fs from 'fs/promises';
 import path from 'path';
 import { SimplifiedTransaction, WalletAnalysis } from './defines';
 import { printAnalysis } from './utils';
+import { createAnalyzedData } from "../../packages/data-api/utils";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 async function loadJsonFile(filename: string): Promise<SimplifiedTransaction[]> {
   const filePath = path.join(__dirname, filename);
@@ -162,6 +166,7 @@ async function main() {
 
     const [analysis, combinedDescriptions] = analyzeTransactions(transactions, ownerWalletAddress);
     printAnalysis(analysis);
+    await createAnalyzedData(analysis);
     await writeAnalysisToFile(analysis, ownerWalletAddress);
     await writeDescriptionsToFile(combinedDescriptions, ownerWalletAddress);
 

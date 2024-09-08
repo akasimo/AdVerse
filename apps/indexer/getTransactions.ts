@@ -3,10 +3,12 @@ import dotenv from 'dotenv';
 import fs from 'fs/promises';
 import path from 'path';
 import { HeliusTransaction, SimplifiedTransaction } from './defines';
+import { createTransactions } from "../../packages/data-api/utils";
+
 // Load environment variables from .env file
 dotenv.config();
 
-const MAX_BATCHES = 5; // Define the maximum number of batches to fetch
+const MAX_BATCHES = 8; // Define the maximum number of batches to fetch
 
 class SolanaIndexer {
   private apiKey: string;
@@ -53,16 +55,7 @@ class SolanaIndexer {
   }
 }
 
-async function saveToJsonFile(data: HeliusTransaction[], filename: string): Promise<void> {
-  const simplifiedData: SimplifiedTransaction[] = data.map(tx => ({
-    description: tx.description,
-    type: tx.type,
-    source: tx.source,
-    feePayer: tx.feePayer,
-    signature: tx.signature,
-    slot: tx.slot,
-    timestamp: tx.timestamp,
-  }));
+async function saveToJsonFile(simplifiedData: SimplifiedTransaction[], filename: string): Promise<void> {
 
   const filePath = path.join(__dirname, filename);
   await fs.writeFile(filePath, JSON.stringify(simplifiedData, null, 2));
@@ -72,15 +65,22 @@ async function saveToJsonFile(data: HeliusTransaction[], filename: string): Prom
 async function processWalletTransactions(indexer: SolanaIndexer, walletAddress: string): Promise<void> {
   try {
     const transactions = await indexer.getAllTransactions(walletAddress);
-    console.log(`Retrieved ${transactions.length} transactions for wallet ${walletAddress}`);
+    // console.log(`Retrieved ${transactions.length} transactions for wallet ${walletAddress}`);
     
     // Save transactions to a JSON file
-    await saveToJsonFile(transactions, `transactions_${walletAddress}.json`);
+    const simplifiedData: SimplifiedTransaction[] = transactions.map(tx => ({
+      description: tx.description,
+      type: tx.type,
+      source: tx.source,
+      feePayer: tx.feePayer,
+      signature: tx.signature,
+      slot: tx.slot,
+      timestamp: tx.timestamp,
+    }));
+
+    await saveToJsonFile(simplifiedData, `transactions_${walletAddress}.json`);
+    await createTransactions(simplifiedData);
     
-    // Process transactions as needed
-    transactions.forEach((tx, index) => {
-      console.log(`Transaction ${index + 1}:`, tx.signature);
-    });
   } catch (error) {
     console.error(`Error processing transactions for wallet ${walletAddress}:`, error);
   }

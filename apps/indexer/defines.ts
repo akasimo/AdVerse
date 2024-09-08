@@ -6,7 +6,6 @@ export interface HeliusTransaction {
     signature: string;
     slot: number;
     timestamp: number;
-    // Add any other properties that might be in the full HeliusTransaction
 }
   
 export interface SimplifiedTransaction {

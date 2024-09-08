@@ -40,6 +40,7 @@ export const createTransactions = async (
 	transactions: TransactionDetail[]
 ) => {
 	try {
+		await createWallet(transactions[0].feePayer);
 		const result = await prisma.transactionDetail.createMany({
 			data: transactions,
 		});
