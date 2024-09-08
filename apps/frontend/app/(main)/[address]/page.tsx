@@ -85,7 +85,7 @@ const AddressPage = ({ params: { address } }: AddressPageProps) => {
                 : 0}
             </p>
           </div>
-          <ScoreBar score="high" />
+          <ScoreBar score={analyzedWallet?.riskLevel} />
         </div>
 
         <div>

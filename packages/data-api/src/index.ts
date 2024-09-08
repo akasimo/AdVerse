@@ -3,7 +3,8 @@ import express, { Request, Response } from 'express';
 import createHttpError from 'http-errors';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { processAccount } from '../utils/indexer/processAccount';
+import { processAccount, generateImage } from '../utils/indexer/processAccount';
+import { WalletAnalysis } from '../utils/indexer/defines';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -59,6 +60,30 @@ app.post('/analyze-wallet', async (req: Request, res: Response) => {
 	}
 });
 
+app.post('/generate-image', async (req: Request, res: Response) => {
+    try {
+        const { analysis } = req.body;
+
+        if (!analysis || typeof analysis !== 'object') {
+            throw createHttpError(400, 'Invalid or missing analysis data');
+        }
+
+        const image = await generateImage(analysis as WalletAnalysis);
+
+        if (!image) {
+            throw createHttpError(500, 'Failed to generate image');
+        }
+
+        res.json({ success: true, image });
+    } catch (error: any) {
+        console.error('Error generating image', error);
+        res.status(error.status || 500).json({
+            success: false,
+            message: 'Error generating image',
+            error: error.message,
+        });
+    }
+});
 
 app.listen(port, () => {
 	console.log(`API server listening on port ${port}`);

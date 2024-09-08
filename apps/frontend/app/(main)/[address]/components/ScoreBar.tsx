@@ -53,7 +53,7 @@ const CircularProgress = ({ score }: { score: string | undefined }) => {
 
       <div className="absolute flex flex-col items-center justify-center">
         <span className="text-2xl font-bold">{clampedScore}%</span>
-        <span className="text-sm text-gray-600">High Spender</span>
+        <span className="text-sm text-gray-600">{score} Spender</span>
       </div>
     </div>
   );
