@@ -8,7 +8,7 @@ import { createTransactions } from "..";
 // Load environment variables from .env file
 dotenv.config();
 
-const MAX_BATCHES = 1; // Define the maximum number of batches to fetch
+const MAX_BATCHES = 5; // Define the maximum number of batches to fetch
 
 class SolanaIndexer {
   private apiKey: string;

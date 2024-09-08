@@ -2,6 +2,8 @@ import { PrismaClient } from '@prisma/client';
 import express, { Request, Response } from 'express';
 import createHttpError from 'http-errors';
 import dotenv from 'dotenv';
+import cors from 'cors';
+import { processAccount } from '../utils/indexer/processAccount';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -9,6 +11,7 @@ const prisma = new PrismaClient();
 dotenv.config();
 
 app.use(express.json());
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
 // Define a GET route that takes a wallet address as a URL parameter
@@ -31,9 +34,10 @@ app.post('/analyze-wallet', async (req: Request, res: Response) => {
 					address: walletAddress,
 				},
 			});
-			// const result = await processAccount();
-			// res.send(result);
-			res.status(500).send('No wallet yet');
+			console.log("Starting indexing logic");
+			const result = await processAccount(walletAddress);
+			console.log("result received");
+			res.send(result);
 		} else {
 			const result = await prisma.analyzedTransaction.findUnique({
 				where: {
@@ -54,6 +58,7 @@ app.post('/analyze-wallet', async (req: Request, res: Response) => {
 		});
 	}
 });
+
 
 app.listen(port, () => {
 	console.log(`API server listening on port ${port}`);

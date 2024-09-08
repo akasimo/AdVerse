@@ -3,48 +3,62 @@ import { WalletAnalysis } from './defines';
 import fs from 'fs/promises';
 
 const platformInfo = {
-    TENSOR: "A decentralized NFT marketplace on Solana, known for its sleek interface and focus on digital art collections.",
-    JUPITER: "A key DeFi aggregator in the Solana ecosystem, offering efficient token swaps and liquidity provision.",
-    RAYDIUM: "A leading automated market maker (AMM) and decentralized exchange (DEX) on Solana, known for its yield farming opportunities."
+	TENSOR:
+		'A decentralized NFT marketplace on Solana, known for its sleek interface and focus on digital art collections.',
+	JUPITER:
+		'A key DeFi aggregator in the Solana ecosystem, offering efficient token swaps and liquidity provision.',
+	RAYDIUM:
+		'A leading automated market maker (AMM) and decentralized exchange (DEX) on Solana, known for its yield farming opportunities.',
 };
 
 function reformatAnalysis(analysis: WalletAnalysis): any {
-    const now = new Date();
-    const lastActivityDate = new Date(analysis.lastActivityTimestamp);
-    const firstActivityDate = new Date(analysis.activityPeriod.start);
-    
-    const daysSinceLastActivity = Math.floor((now.getTime() - lastActivityDate.getTime()) / (1000 * 3600 * 24));
-    const daysSinceFirstActivity = Math.floor((now.getTime() - firstActivityDate.getTime()) / (1000 * 3600 * 24));
+	const now = new Date();
+	const lastActivityDate = new Date(analysis.lastActivityTimestamp);
+	const firstActivityDate = new Date(analysis.activityPeriod.start);
 
-    const lastActivityString = daysSinceLastActivity === 1 ? "1 day ago" : `${daysSinceLastActivity} days ago`;
+	const daysSinceLastActivity = Math.floor(
+		(now.getTime() - lastActivityDate.getTime()) / (1000 * 3600 * 24)
+	);
+	const daysSinceFirstActivity = Math.floor(
+		(now.getTime() - firstActivityDate.getTime()) / (1000 * 3600 * 24)
+	);
 
-    return {
-        programUsage: analysis.programUsage,
-        interactionTypes: analysis.interactionTypes,
-        categories: analysis.categories,
-        nftActivity: analysis.nftActivity,
-        lastActivity: lastActivityString,
-        totalTransactions: analysis.totalTransactions,
-        mostUsedProgram: analysis.mostUsedProgram,
-        mostFrequentInteraction: analysis.mostFrequentInteraction,
-        firstActivityDate,
-        programFrequency: analysis.programFrequency,
-        averageTransactionsPerDay: analysis.averageTransactionsPerDay,
-        riskLevel: analysis.riskLevel,
-        activityRecency: analysis.activityRecency,
-        spendingBehavior: analysis.spendingBehavior,
-        userTags: analysis.userTags,
-    };
+	const lastActivityString =
+		daysSinceLastActivity === 1
+			? '1 day ago'
+			: `${daysSinceLastActivity} days ago`;
+
+	return {
+		programUsage: analysis.programUsage,
+		interactionTypes: analysis.interactionTypes,
+		categories: analysis.categories,
+		nftActivity: analysis.nftActivity,
+		lastActivity: lastActivityString,
+		totalTransactions: analysis.totalTransactions,
+		mostUsedProgram: analysis.mostUsedProgram,
+		mostFrequentInteraction: analysis.mostFrequentInteraction,
+		firstActivityDate,
+		programFrequency: analysis.programFrequency,
+		averageTransactionsPerDay: analysis.averageTransactionsPerDay,
+		riskLevel: analysis.riskLevel,
+		activityRecency: analysis.activityRecency,
+		spendingBehavior: analysis.spendingBehavior,
+		userTags: analysis.userTags,
+	};
 }
 
-export function generatePromptFromAnalysis(analysis: WalletAnalysis): string {
-    const processedAnalysis = reformatAnalysis(analysis);
-    const relevantPlatforms = Object.entries(platformInfo)
-        .filter(([platform]) => analysis.programUsage.hasOwnProperty(platform))
-        .map(([platform, info]) => `- ${platform}: ${info}`)
-        .join('\n');
+export function generatePromptFromAnalysis(
+	analysis: WalletAnalysis
+): string {
+	const processedAnalysis = reformatAnalysis(analysis);
+	const relevantPlatforms = Object.entries(platformInfo)
+		.filter(([platform]) =>
+			analysis.programUsage.hasOwnProperty(platform)
+		)
+		.map(([platform, info]) => `- ${platform}: ${info}`)
+		.join('\n');
 
-    const promptText = `
+	const promptText = `
     User Data: ${JSON.stringify(processedAnalysis, null, 2)}
 
     Platform Information:
@@ -69,26 +83,29 @@ export function generatePromptFromAnalysis(analysis: WalletAnalysis): string {
 
     IMPORTANT: Your response must ONLY contain the Stable Diffusion prompt. Do not include any explanations, introductions, or additional text. The entire response should be the prompt itself, ready to be used directly in a Stable Diffusion model. Any text that is not part of the prompt will be considered an error.`;
 
-    return promptText;
+	return promptText;
 }
 
-export async function loadAnalysisFile(walletAddress: string): Promise<WalletAnalysis> {
-    const fileName = `analysis_${walletAddress}.json`;
-    const filePath = path.join(__dirname, fileName);
-    const fileContent = await fs.readFile(filePath, 'utf-8');
-    return JSON.parse(fileContent) as WalletAnalysis;
+export async function loadAnalysisFile(
+	walletAddress: string
+): Promise<WalletAnalysis> {
+	const fileName = `analysis_${walletAddress}.json`;
+	const filePath = path.join(__dirname, fileName);
+	const fileContent = await fs.readFile(filePath, 'utf-8');
+	return JSON.parse(fileContent) as WalletAnalysis;
 }
 
 // async function main() {
 //     try {
 //         // You would typically get this from command line arguments or environment variables
 //         const walletAddress = '8SKisd77dkXDxbHmhQbrkp6mjnKcwL5hYPqh9Yr8isvh';
-
 //         const analysis = await loadAnalysisFile(walletAddress);
-//         const promptText = generatePromptFromAnalysis(analysis);
+//         // const promptText = generatePromptFromAnalysis(analysis);
 
-//         console.log('Generated LLM Prompt:');
-//         console.log(promptText);
+//         // console.log('Generated LLM Prompt:');
+//         // console.log(promptText);
+//         const score = calculateDegenScore(analysis);
+//         console.log(`Degen Score: ${score}`);
 
 //         // Here you would pass the promptText to your LLM of choice
 //         // For example:

@@ -1,0 +1,47 @@
+{
+  "walletAddress": "8SKisd77dkXDxbHmhQbrkp6mjnKcwL5hYPqh9Yr8isvh",
+  "programList": [
+    "TENSOR",
+    "SYSTEM_PROGRAM",
+    "UNKNOWN"
+  ],
+  "programUsage": {
+    "TENSOR": 55,
+    "SYSTEM_PROGRAM": 6,
+    "UNKNOWN": 3
+  },
+  "interactionTypes": {
+    "NFT_LISTING": 27,
+    "UNKNOWN": 31,
+    "TRANSFER": 6
+  },
+  "categories": {
+    "NFT": 27,
+    "Other": 37
+  },
+  "nftActivity": {
+    "listings": 27,
+    "purchases": 0
+  },
+  "lastActivityTimestamp": 1725723095,
+  "totalTransactions": 64,
+  "mostUsedProgram": "TENSOR",
+  "mostFrequentInteraction": "NFT_LISTING",
+  "activityPeriod": {
+    "start": 1724956193,
+    "end": 1725723095
+  },
+  "programFrequency": {
+    "TENSOR": 5.569,
+    "SYSTEM_PROGRAM": 0.799,
+    "UNKNOWN": 0.939
+  },
+  "averageTransactionsPerDay": 6.48,
+  "riskLevel": "High",
+  "activityRecency": "Very Recent (Last 24 hours)",
+  "spendingBehavior": "High Spender",
+  "userTags": [
+    "Degen",
+    "NFT Trader"
+  ]
+}
