@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "ES2020", // Use the latest ECMAScript features
-		"module": "ESNext", // Output as ES modules
+		"module": "CommonJS", // Output as ES modules
 		"moduleResolution": "node", // Resolve modules in Node.js style
 		"esModuleInterop": true, // Enables compatibility with CommonJS modules
 		"skipLibCheck": true, // Skip type checking of declaration files

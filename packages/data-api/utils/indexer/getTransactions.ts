@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import fs from 'fs/promises';
 import path from 'path';
 import { HeliusTransaction, SimplifiedTransaction } from './defines';
-import { createTransactions } from "../../packages/data-api/utils";
+import { createTransactions } from "..";
 
 // Load environment variables from .env file
 dotenv.config();

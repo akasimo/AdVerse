@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { SimplifiedTransaction, WalletAnalysis } from './defines';
 import { printAnalysis } from './utils';
-import { createAnalyzedData } from "../../packages/data-api/utils";
+import { createAnalyzedData } from "..";
 import dotenv from 'dotenv';
 
 dotenv.config();
