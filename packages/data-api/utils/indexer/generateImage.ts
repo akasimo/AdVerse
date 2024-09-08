@@ -3,7 +3,7 @@ import Replicate from "replicate";
 
 dotenv.config();
 
-export async function generateImageViaDiffusion(prompt: string): Promise<string | null> {
+export async function generateImageViaDiffusion(prompt: string): Promise< object | null > {
     console.log('auth key:', process.env.REPLICATE_API_TOKEN);
     const replicate = new Replicate({
         auth: process.env.REPLICATE_API_TOKEN
@@ -22,7 +22,7 @@ export async function generateImageViaDiffusion(prompt: string): Promise<string 
     
     const output = await replicate.run(REPLICATE_ENDPOINT, { input });
     console.log(output)
-    return null;
+    return output;
 }
 
 

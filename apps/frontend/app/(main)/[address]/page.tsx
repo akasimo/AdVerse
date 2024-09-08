@@ -8,6 +8,7 @@ import MostUsages from "./components/MostUsages";
 import { Wallet } from "lucide-react";
 import WalletAndTags from "./components/WalletAndTags";
 import CustomBarChart from "./components/BarChart";
+import ImageGenerator from "@/components/shared/ImageGenerator";
 
 interface AddressPageProps {
   params: {
@@ -54,6 +55,7 @@ const AddressPage = ({ params: { address } }: AddressPageProps) => {
         tags={analyzedWallet?.userTags}
         riskLevel={analyzedWallet?.riskLevel}
       />
+      <ImageGenerator />
       <div className="mr-12 flex justify-between">
         <SimpleBarChart
           data={programUsages}

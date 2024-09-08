@@ -21,6 +21,7 @@ const Searchbar = () => {
       },
     );
     toast.promise(searchPromise, {
+      loading: "Wallet data is fetching",
       success: (result) => {
         updateAnalyzedWallet(result.data);
         router.push(`/${searchRef.current?.value}`);

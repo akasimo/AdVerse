@@ -3,7 +3,10 @@ import express, { Request, Response } from 'express';
 import createHttpError from 'http-errors';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { processAccount, generateImage } from '../utils/indexer/processAccount';
+import {
+	processAccount,
+	generateImage,
+} from '../utils/indexer/processAccount';
 import { WalletAnalysis } from '../utils/indexer/defines';
 
 const app = express();
@@ -35,9 +38,9 @@ app.post('/analyze-wallet', async (req: Request, res: Response) => {
 					address: walletAddress,
 				},
 			});
-			console.log("Starting indexing logic");
+			console.log('Starting indexing logic');
 			const result = await processAccount(walletAddress);
-			console.log("result received");
+			console.log('result received');
 			res.send(result);
 		} else {
 			const result = await prisma.analyzedTransaction.findUnique({
@@ -61,28 +64,29 @@ app.post('/analyze-wallet', async (req: Request, res: Response) => {
 });
 
 app.post('/generate-image', async (req: Request, res: Response) => {
-    try {
-        const { analysis } = req.body;
+	try {
+		const { analysis } = req.body;
+		console.log(analysis);
 
-        if (!analysis || typeof analysis !== 'object') {
-            throw createHttpError(400, 'Invalid or missing analysis data');
-        }
+		if (!analysis || typeof analysis !== 'object') {
+			throw createHttpError(400, 'Invalid or missing analysis data');
+		}
 
-        const image = await generateImage(analysis as WalletAnalysis);
+		const image = await generateImage(analysis as WalletAnalysis);
 
-        if (!image) {
-            throw createHttpError(500, 'Failed to generate image');
-        }
+		if (!image) {
+			throw createHttpError(500, 'Failed to generate image');
+		}
 
-        res.json({ success: true, image });
-    } catch (error: any) {
-        console.error('Error generating image', error);
-        res.status(error.status || 500).json({
-            success: false,
-            message: 'Error generating image',
-            error: error.message,
-        });
-    }
+		res.json({ success: true, image });
+	} catch (error: any) {
+		console.error('Error generating image', error);
+		res.status(error.status || 500).json({
+			success: false,
+			message: 'Error generating image',
+			error: error.message,
+		});
+	}
 });
 
 app.listen(port, () => {
