@@ -15,7 +15,7 @@ const Searchbar = () => {
 
   const handleSearch = async () => {
     const searchPromise = axios.post<UserActivity>(
-      "http://207.154.208.36:3000/analyze-wallet",
+      "http://207.154.208.36:8080/analyze-wallet",
       {
         walletAddress: searchRef.current?.value,
       },

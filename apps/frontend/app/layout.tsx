@@ -28,6 +28,7 @@ export default function RootLayout({
         <Providers>
           <Navbar />
           {children}
+          <p className="m-2 text-center">All rights reserved | 2024</p>
         </Providers>
       </body>
     </html>

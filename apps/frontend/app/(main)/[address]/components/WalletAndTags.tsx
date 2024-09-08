@@ -24,7 +24,10 @@ const WalletAndTags = ({
       <div className="ml-4">
         <ul className="flex gap-2">
           {tags?.map((tag) => (
-            <p className="inline-block rounded-lg bg-primary/30 px-2 py-1 text-white">
+            <p
+              key={tag}
+              className="inline-block rounded-lg bg-primary/30 px-2 py-1 text-white"
+            >
               {tag}
             </p>
           ))}

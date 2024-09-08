@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"main": "index.js",
 	"scripts": {
-		"build": "nodemon tsc",
+		"build": "nodemon ts-node src/index.ts",
 		"start": "nodemon ts-node-esm src/index.ts",
 		"seed": "nodemon ts-node services/seed.ts"
 	},

@@ -16,7 +16,7 @@ const ImageGenerator = () => {
       console.log("Sending analysis:", analyzedWallet);
 
       const response = await axios.post(
-        "http://207.154.208.36:3000/generate-image",
+        "http://207.154.208.36:8080/generate-image",
         { analysis: analyzedWallet },
         {
           headers: {
