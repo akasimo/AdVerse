@@ -18,13 +18,7 @@ export async function processAccount(walletAddress: string): Promise<WalletAnaly
     }
     return analysis;
 }
-// export a
-// async function main() {
-//     const wallet = '8SKisd77dkXDxbHmhQbrkp6mjnKcwL5hYPqh9Yr8isvh';
-//     await processAccount(wallet);
-// }
 
-// main();
 export async function generateImage(analysis: WalletAnalysis): Promise<string | null> {
     const promptFromAnalysis = generatePromptFromAnalysis(analysis);
     if (!prompt) {
@@ -39,3 +33,10 @@ export async function generateImage(analysis: WalletAnalysis): Promise<string | 
     const image = await generateImageViaDiffusion(promptFromGpt);
     return image;
 }
+
+// async function main() {
+//     const wallet = '8SKisd77dkXDxbHmhQbrkp6mjnKcwL5hYPqh9Yr8isvh';
+//     await processAccount(wallet);
+// }
+
+// main();

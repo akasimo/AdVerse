@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import dotenv from 'dotenv';
 import { ChatCompletion } from "openai/resources";
+import { generatePromptFromAnalysis, loadAnalysisFile } from "./generatePromptFromAnalysis";
 
 dotenv.config();
 
@@ -40,25 +41,22 @@ export async function generatePromptFromGpt(initialPrompt: string): Promise<stri
   }
 }
 
-async function main() {
-    try {
-        // You would typically get this from command line arguments or environment variables
-        const walletAddress = '8SKisd77dkXDxbHmhQbrkp6mjnKcwL5hYPqh9Yr8isvh';
+// async function main() {
+//     try {
+//         // You would typically get this from command line arguments or environment variables
+//         const walletAddress = '8SKisd77dkXDxbHmhQbrkp6mjnKcwL5hYPqh9Yr8isvh';
 
-        const analysis = await loadAnalysisFile(walletAddress);
-        const promptText = generateLLMPrompt(analysis);
+//         const analysis = await loadAnalysisFile(walletAddress);
+//         const promptText = generatePromptFromAnalysis(analysis);
 
-        console.log('Generated LLM Prompt:');
-        console.log(promptText);
+//         const response = await generatePromptFromGpt(promptText);
+//         console.log(response);
 
-        // Here you would pass the promptText to your LLM of choice
-        // For example:
-        // const llmResponse = await sendToLLM(promptText);
-        // console.log('LLM Response:', llmResponse);
+//     } catch (error) {
+//         console.error('Error generating LLM prompt:', error);
+//     }
+// }
 
-    } catch (error) {
-        console.error('Error generating LLM prompt:', error);
-    }
-}
+// main();
 
-main();
+

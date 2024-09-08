@@ -72,32 +72,32 @@ export function generatePromptFromAnalysis(analysis: WalletAnalysis): string {
     return promptText;
 }
 
-async function loadAnalysisFile(walletAddress: string): Promise<WalletAnalysis> {
+export async function loadAnalysisFile(walletAddress: string): Promise<WalletAnalysis> {
     const fileName = `analysis_${walletAddress}.json`;
     const filePath = path.join(__dirname, fileName);
     const fileContent = await fs.readFile(filePath, 'utf-8');
     return JSON.parse(fileContent) as WalletAnalysis;
 }
 
-async function main() {
-    try {
-        // You would typically get this from command line arguments or environment variables
-        const walletAddress = '8SKisd77dkXDxbHmhQbrkp6mjnKcwL5hYPqh9Yr8isvh';
+// async function main() {
+//     try {
+//         // You would typically get this from command line arguments or environment variables
+//         const walletAddress = '8SKisd77dkXDxbHmhQbrkp6mjnKcwL5hYPqh9Yr8isvh';
 
-        const analysis = await loadAnalysisFile(walletAddress);
-        const promptText = generatePromptFromAnalysis(analysis);
+//         const analysis = await loadAnalysisFile(walletAddress);
+//         const promptText = generatePromptFromAnalysis(analysis);
 
-        console.log('Generated LLM Prompt:');
-        console.log(promptText);
+//         console.log('Generated LLM Prompt:');
+//         console.log(promptText);
 
-        // Here you would pass the promptText to your LLM of choice
-        // For example:
-        // const llmResponse = await sendToLLM(promptText);
-        // console.log('LLM Response:', llmResponse);
+//         // Here you would pass the promptText to your LLM of choice
+//         // For example:
+//         // const llmResponse = await sendToLLM(promptText);
+//         // console.log('LLM Response:', llmResponse);
 
-    } catch (error) {
-        console.error('Error generating LLM prompt:', error);
-    }
-}
+//     } catch (error) {
+//         console.error('Error generating LLM prompt:', error);
+//     }
+// }
 
-main();
+// main();
