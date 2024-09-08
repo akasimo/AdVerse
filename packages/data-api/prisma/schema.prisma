@@ -25,27 +25,28 @@ model TransactionDetail {
 }
 
 model AnalyzedTransaction {
-  id                     String              @id @default(auto()) @map("_id") @db.ObjectId
-  walletAddress          String              @unique
-  programList            String[]
-  programUsage           Json                // { "TENSOR": 260, "SYSTEM_PROGRAM": 62, ... }
-  interactionTypes       Json                // { "NFT_LISTING": 115, "TRANSFER": 62, ... }
-  categories             Json                // { "NFT": 117, "Other": 224, ... }
-  nftActivity            Json                // { "listings": 115, "purchases": 1 }
-  lastActivityTimestamp  Int
-  totalTransactions      Int
-  mostUsedProgram        String
-  mostFrequentInteraction String
-  activityPeriod         Json                // { "start": 1722368841, "end": 1725723095 }
-  programFrequency       Json                // { "TENSOR": 6.529, "SYSTEM_PROGRAM": 1.595, ... }
-  averageTransactionsPerDay Float
-  riskLevel              String
-  activityRecency        String
-  spendingBehavior       String
-  userTags               String[]
-  wallet                 Wallet  @relation(fields: [walletAddress], references: [address]) 
-}
+  id                     String    @id @default(auto()) @map("_id") @db.ObjectId
+  walletAddress          String    @unique
+  programList            String[]  // Array of programs
+  programUsage           Json      // { "TENSOR": 260, "SYSTEM_PROGRAM": 62, ... }
+  interactionTypes       Json      // { "NFT_LISTING": 115, "TRANSFER": 62, ... }
+  categories             Json      // { "NFT": 117, "Other": 224, ... }
+  nftActivity            Json      // { "listings": 115, "purchases": 1 }
+  lastActivityTimestamp  Int       // Unix timestamp
+  totalTransactions      Int       // Total transaction count
+  mostUsedProgram        String    // The most frequently used program
+  mostFrequentInteraction String   // The most frequent interaction type
+  activityPeriod         Json      // { "start": 1722368841, "end": 1725723095 }
+  programFrequency       Json      // { "TENSOR": 6.529, "SYSTEM_PROGRAM": 1.595, ... }
+  averageTransactionsPerDay Float  // Average transactions per day
+  riskLevel              String    // Risk level of user
+  activityRecency        String    // How recent the user's activity was
+  spendingBehavior       String    // User's spending pattern
+  userTags               String[]  // Array of user tags
 
+  // Relations
+  wallet                 Wallet    @relation(fields: [walletAddress], references: [address])
+}
 
 
 model Wallet {

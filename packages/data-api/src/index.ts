@@ -1,7 +1,10 @@
+import { PrismaClient } from '@prisma/client';
 import express, { Request, Response } from 'express';
+import createHttpError from 'http-errors';
 
 const app = express();
 const port = process.env.PORT || 3000;
+const prisma = new PrismaClient();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -20,12 +23,11 @@ app.get('/wallet/:address', async (req: Request, res: Response) => {
 		// const indexerData = indexerResponse.data;
 
 		// Custom logic to handle the indexer data
-		const processedData = processIndexerData('hello');
 
 		// Send back the processed data
 		res.json({
 			success: true,
-			data: processedData,
+			data: 'hello',
 		});
 	} catch (error: any) {
 		console.error('Error calling indexer API', error);
@@ -39,11 +41,45 @@ app.get('/wallet/:address', async (req: Request, res: Response) => {
 	}
 });
 
-// Function to process the data you get from the indexer
-function processIndexerData(data: any) {
-	// Example: Modify or filter the indexer data here
-	return data; // Modify as needed
-}
+app.post(
+	'/wallet/transactions',
+	async (req: Request, res: Response) => {
+		try {
+			// Data will be an array of TransactionDetail objects
+			const transactions = req.body;
+
+			const result = await prisma.transactionDetail.createMany({
+				data: transactions,
+			});
+
+			res.send({
+				result,
+			});
+		} catch (error) {
+			throw createHttpError[500]('Error while creating transactions');
+		}
+	}
+);
+
+app.post(
+	'/wallet/analyzed-transaction',
+	async (req: Request, res: Response) => {
+		try {
+			// Data will be an array of TransactionDetail objects
+			const analyzed_transaction = req.body;
+
+			const result = await prisma.transactionDetail.create({
+				data: analyzed_transaction,
+			});
+
+			res.send({
+				result,
+			});
+		} catch (error) {
+			throw createHttpError[500]('Error while creating transactions');
+		}
+	}
+);
 
 app.listen(port, () => {
 	console.log(`API server listening on port ${port}`);
