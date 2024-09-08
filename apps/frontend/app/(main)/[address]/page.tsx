@@ -27,14 +27,16 @@ const AddressPage = ({ params: { address } }: AddressPageProps) => {
           name: key.toLowerCase().includes("system")
             ? "system".toUpperCase()
             : key,
-          program_usage: value,
+          value,
         }),
       );
+
+      console.log(programData);
 
       const category_data = Object.entries(analyzedWallet?.categories).map(
         ([key, value]) => ({
           name: key,
-          value,
+          tx_amount: value,
         }),
       );
 
@@ -53,7 +55,11 @@ const AddressPage = ({ params: { address } }: AddressPageProps) => {
         riskLevel={analyzedWallet?.riskLevel}
       />
       <div className="mr-12 flex justify-between">
-        <SimpleBarChart data={programUsages} title="Program Usages" />
+        <SimpleBarChart
+          data={programUsages}
+          title="Program Usages"
+          dataKey="value"
+        />
         <div className="mt-4">
           <div className="rounded-lg border-2 border-dashed border-black bg-white/50 p-4 backdrop-blur-md">
             <h5 className="mb-4 whitespace-nowrap font-bold">NFT Activity</h5>
@@ -84,7 +90,11 @@ const AddressPage = ({ params: { address } }: AddressPageProps) => {
 
         <div>
           <div className="flex flex-col items-center">
-            <SimpleBarChart data={categories} title="Interactions" />
+            <SimpleBarChart
+              data={categories}
+              title="Interaction Categories"
+              dataKey="tx_amount"
+            />
           </div>
         </div>
         <MostUsages

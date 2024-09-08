@@ -9,7 +9,7 @@ interface MostUsagesProps {
 
 const MostUsages = ({ interaction, program }: MostUsagesProps) => {
   return (
-    <div className="ml-2 flex items-center gap-2 self-start border">
+    <div className="ml-2 mt-4 flex flex-col items-center gap-2 self-start border">
       <GlassCard>
         <p className="text-primary-foreground/90">Favorite Program</p>
         <p className="font-bold">{program}</p>
