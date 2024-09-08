@@ -1,4 +1,14 @@
-import { PrismaClient, TransactionDetail } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+
+interface TransactionDetail {
+	description: string;
+	type: string;
+	source: string;
+	feePayer: string;
+	signature: string;
+	slot: number;
+	timestamp: number;
+}
 
 const prisma = new PrismaClient();
 

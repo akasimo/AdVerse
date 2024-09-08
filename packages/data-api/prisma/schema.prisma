@@ -17,12 +17,12 @@ model TransactionDetail {
   type        String
   source      String
   feePayer    String
-  walletAddress String
-  wallet Wallet @relation(fields: [walletAddress], references: [address])
+  wallet Wallet @relation(fields: [feePayer], references: [address])
   signature   String
   slot        Int
   timestamp   Int
 }
+
 
 model AnalyzedTransaction {
   id                     String    @id @default(auto()) @map("_id") @db.ObjectId
