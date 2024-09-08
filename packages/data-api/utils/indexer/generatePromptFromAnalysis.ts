@@ -8,7 +8,7 @@ const platformInfo = {
     RAYDIUM: "A leading automated market maker (AMM) and decentralized exchange (DEX) on Solana, known for its yield farming opportunities."
 };
 
-function processAnalysis(analysis: WalletAnalysis): any {
+function reformatAnalysis(analysis: WalletAnalysis): any {
     const now = new Date();
     const lastActivityDate = new Date(analysis.lastActivityTimestamp);
     const firstActivityDate = new Date(analysis.activityPeriod.start);
@@ -37,16 +37,14 @@ function processAnalysis(analysis: WalletAnalysis): any {
     };
 }
 
-export function generateLLMPrompt(analysis: WalletAnalysis): string {
-    const processedAnalysis = processAnalysis(analysis);
+export function generatePromptFromAnalysis(analysis: WalletAnalysis): string {
+    const processedAnalysis = reformatAnalysis(analysis);
     const relevantPlatforms = Object.entries(platformInfo)
         .filter(([platform]) => analysis.programUsage.hasOwnProperty(platform))
         .map(([platform, info]) => `- ${platform}: ${info}`)
         .join('\n');
 
     const promptText = `
-    You are an AI assistant tasked with creating a Stable Diffusion image generation prompt that visualizes an ethereal Solana ecosystem as a surreal dreamscape, bearing the subtle imprints of a profound journey that has already transpired. This prompt should evoke a sense of lingering presence, echoes of past interactions, and the residual energy of completed transactions, all without depicting human figures. Use the following data and guidelines to craft your prompt:
-
     User Data: ${JSON.stringify(processedAnalysis, null, 2)}
 
     Platform Information:
@@ -87,7 +85,7 @@ async function main() {
         const walletAddress = '8SKisd77dkXDxbHmhQbrkp6mjnKcwL5hYPqh9Yr8isvh';
 
         const analysis = await loadAnalysisFile(walletAddress);
-        const promptText = generateLLMPrompt(analysis);
+        const promptText = generatePromptFromAnalysis(analysis);
 
         console.log('Generated LLM Prompt:');
         console.log(promptText);

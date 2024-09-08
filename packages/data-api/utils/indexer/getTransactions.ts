@@ -8,7 +8,7 @@ import { createTransactions } from "..";
 // Load environment variables from .env file
 dotenv.config();
 
-const MAX_BATCHES = 8; // Define the maximum number of batches to fetch
+const MAX_BATCHES = 1; // Define the maximum number of batches to fetch
 
 class SolanaIndexer {
   private apiKey: string;
@@ -55,20 +55,27 @@ class SolanaIndexer {
   }
 }
 
-async function saveToJsonFile(simplifiedData: SimplifiedTransaction[], filename: string): Promise<void> {
+const apiKey = process.env.HELIUS_API_KEY;
+if (!apiKey) {
+  throw new Error('HELIUS_API_KEY is not defined in the .env file');
+}
+
+const indexer = new SolanaIndexer(apiKey);
+
+async function saveToJsonFile(simplifiedTxData: SimplifiedTransaction[], filename: string): Promise<void> {
 
   const filePath = path.join(__dirname, filename);
-  await fs.writeFile(filePath, JSON.stringify(simplifiedData, null, 2));
+  await fs.writeFile(filePath, JSON.stringify(simplifiedTxData, null, 2));
   console.log(`Data saved to ${filePath}`);
 }
 
-async function processWalletTransactions(indexer: SolanaIndexer, walletAddress: string): Promise<void> {
+export async function processWalletTransactions(walletAddress: string): Promise<SimplifiedTransaction[] | undefined> {
   try {
     const transactions = await indexer.getAllTransactions(walletAddress);
     // console.log(`Retrieved ${transactions.length} transactions for wallet ${walletAddress}`);
-    
+
     // Save transactions to a JSON file
-    const simplifiedData: SimplifiedTransaction[] = transactions.map(tx => ({
+    const simplifiedTxData: SimplifiedTransaction[] = transactions.map(tx => ({
       description: tx.description,
       type: tx.type,
       source: tx.source,
@@ -78,25 +85,25 @@ async function processWalletTransactions(indexer: SolanaIndexer, walletAddress: 
       timestamp: tx.timestamp,
     }));
 
-    await saveToJsonFile(simplifiedData, `transactions_${walletAddress}.json`);
-    await createTransactions(simplifiedData);
-    
+    // await saveToJsonFile(simplifiedTxData, `transactions_${walletAddress}.json`);
+    await createTransactions(simplifiedTxData);
+    return simplifiedTxData;
   } catch (error) {
     console.error(`Error processing transactions for wallet ${walletAddress}:`, error);
   }
 }
 
-async function main() {
-  const apiKey = process.env.HELIUS_API_KEY;
-  if (!apiKey) {
-    throw new Error('HELIUS_API_KEY is not defined in the .env file');
-  }
+// async function main() {
+//   const apiKey = process.env.HELIUS_API_KEY;
+//   if (!apiKey) {
+//     throw new Error('HELIUS_API_KEY is not defined in the .env file');
+//   }
 
-  const indexer = new SolanaIndexer(apiKey);
+//   const indexer = new SolanaIndexer(apiKey);
   
-  const walletAddress = '8SKisd77dkXDxbHmhQbrkp6mjnKcwL5hYPqh9Yr8isvh';
+//   const walletAddress = '8SKisd77dkXDxbHmhQbrkp6mjnKcwL5hYPqh9Yr8isvh';
   
-  await processWalletTransactions(indexer, walletAddress);
-}
+//   await processWalletTransactions(walletAddress);
+// }
 
-main();
+// main();
