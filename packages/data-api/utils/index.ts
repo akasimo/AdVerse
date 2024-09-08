@@ -12,8 +12,11 @@ interface TransactionDetail {
 
 const prisma = new PrismaClient();
 
-export const createWallet = async (walletAddress: string) => {
+export const createTransactions = async (
+	transactions: TransactionDetail[]
+) => {
 	try {
+		const walletAddress = transactions[0].feePayer;
 		const wallet = await prisma.wallet.findUnique({
 			where: {
 				address: walletAddress,
@@ -21,25 +24,13 @@ export const createWallet = async (walletAddress: string) => {
 		});
 
 		if (!wallet) {
-			const result = await prisma.wallet.create({
+			await prisma.wallet.create({
 				data: {
 					address: walletAddress,
 				},
 			});
-
-			return result;
-		} else {
-			throw Error('Already have a wallet');
 		}
-	} catch (error) {
-		console.log(error);
-	}
-};
 
-export const createTransactions = async (
-	transactions: TransactionDetail[]
-) => {
-	try {
 		const result = await prisma.transactionDetail.createMany({
 			data: transactions,
 		});
