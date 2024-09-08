@@ -16,17 +16,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-
-// Define the WalletData type
-type WalletData = {
-  username: string;
-  vaultId: string;
-  platformUsage: Record<string, number>;
-  timeSpent: Record<string, number>;
-  transactionCategories: Record<string, number>;
-  walletPortfolio: Record<string, number>;
-  degenScore: number;
-};
+import axios from 'axios';
 
 // Register chart components with Chart.js
 ChartJS.register(
@@ -42,65 +32,45 @@ ChartJS.register(
   Legend
 );
 
+type WalletData = {
+  username: string;
+  vaultId: string;
+  platformUsage: Record<string, number>;
+  timeSpent: Record<string, number>;
+  transactionCategories: Record<string, number>;
+  walletPortfolio: Record<string, number>;
+  degenScore: number;
+};
+
 export default function Home() {
   const [query, setQuery] = useState('');
-  const [walletData, setWalletData] = useState<null | WalletData>(null);
+  const [walletData, setWalletData] = useState<WalletData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Mock API response for testing
-  const mockWalletData = {
-    username: 'john_doe',
-    vaultId: 'ABC1234567',
-    platformUsage: {
-      Radium: 40,
-      Serum: 35,
-      Bonfida: 20,
-      MangoMarkets: 5
-    },
-    timeSpent: {
-      Radium: 50,
-      Serum: 30,
-      Bonfida: 10,
-      MangoMarkets: 10
-    },
-    transactionCategories: {
-      GameFi: 30,
-      DeFi: 40,
-      NFT: 20,
-      Others: 10
-    },
-    walletPortfolio: {
-      Solana: 500,
-      USDC: 300,
-      BTC: 150,
-      ETH: 50
-    },
-    degenScore: 85
-  };
-
-  // Simulate fetching wallet data (mocking the API call)
+  // Backend'den cüzdan verisi almak için fetch fonksiyonu
   const fetchWalletData = async (username: string) => {
     setIsLoading(true);
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(mockWalletData);
-      }, 1000); // Simulate 1 second delay
-    }).then((data) => {
-      setWalletData(data as WalletData); // Set the mock wallet data
-      setIsLoading(false);
-    });
+    try {
+      const response = await axios.post('http://207.154.208.36:3000/analyze-wallet', {
+          walletAddress: username
+      });
+      console.log(response.data); // Verileri yazdırın
+  } catch (error) {
+      console.error('API isteği başarısız oldu:', error); // Hataları yakalayın ve gösterin
+  }
+  
   };
 
-  // Handle search input change
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value);
-  };
-
-  // Handle search submission
+  // Arama kutusundaki değeri alıp backend'e istek gönderme
   const handleSearch = () => {
     if (query.trim()) {
-      fetchWalletData(query); // Use mock data
+      fetchWalletData(query); // Backend'e istek yap
     }
+  };
+
+  // Input değişikliklerini yönetme
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
   };
 
   return (
@@ -120,9 +90,9 @@ export default function Home() {
           Search
         </button>
 
-        {isLoading && <p className={styles.loading}>Loading wallet data...</p>}
+        {isLoading && <p className={styles.loading}>Veriler yükleniyor...</p>}
 
-        {/* Show vault ID and charts if wallet data is available */}
+        {/* Gelen wallet verilerini göster */}
         {walletData && (
           <>
             <div className={styles.vaultInfo}>
