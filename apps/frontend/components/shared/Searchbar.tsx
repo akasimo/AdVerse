@@ -33,10 +33,10 @@ const Searchbar = () => {
   return (
     <div className="flex items-center gap-2">
       <div>
-        <label htmlFor="">Wallet Address</label>
         <Input
           ref={searchRef}
-          className="min-w-[300px] lg:max-w-md xl:max-w-lg"
+          className="text-black md:min-w-[500px] lg:max-w-md xl:max-w-lg"
+          placeholder="Wallet Address"
         />
       </div>
 

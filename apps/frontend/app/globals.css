@@ -87,3 +87,40 @@
     @apply text-xs md:text-sm xl:text-base;
   }
 }
+
+.modal-gradient {
+  background: linear-gradient(
+    -45deg,
+    #132035 0%,
+    #182d4e 52.26%,
+    rgba(35, 56, 88, 0.3) 100%
+  );
+  background-size: 400% 400%;
+  animation: gradient 6s ease infinite;
+  backdrop-filter: blur(10px);
+}
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.gradient-text {
+  /* Adjust the font size as needed */
+  font-weight: bold; /* Optional, for emphasis */
+  background: linear-gradient(
+    to right,
+    #9565d8,
+    #433551
+  ); /* Green to navy gradient */
+  -webkit-background-clip: text; /* Clip background to text for webkit browsers */
+  -webkit-text-fill-color: transparent; /* Make text color transparent */
+  background-clip: text; /* Clip background to text for other browsers */
+  color: transparent; /* Fallback color for browsers that don't support background-clip */
+}
