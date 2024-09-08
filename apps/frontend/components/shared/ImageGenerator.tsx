@@ -39,7 +39,9 @@ const ImageGenerator = () => {
 
   return (
     <>
-      <Button onClick={() => setIsOpen(true)}>Generate Image</Button>
+      <Button className="m-4" onClick={() => setIsOpen(true)}>
+        Generate Image
+      </Button>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent>
           <DialogHeader>

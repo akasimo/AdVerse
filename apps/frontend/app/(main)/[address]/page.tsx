@@ -61,6 +61,10 @@ const AddressPage = ({ params: { address } }: AddressPageProps) => {
           data={programUsages}
           title="Program Usages"
           dataKey="value"
+          total_usage={Object.values(analyzedWallet?.programUsage!).reduce(
+            (acc: number, curr: number) => acc + curr,
+            0,
+          )}
         />
         <div className="mt-4">
           <div className="rounded-lg border-2 border-dashed border-black bg-white/50 p-4 backdrop-blur-md">
