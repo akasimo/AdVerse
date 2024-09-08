@@ -147,6 +147,19 @@ async function writeAnalysisToFile(analysis: WalletAnalysis, walletAddress: stri
     console.log(`Analysis written to ${fileName}`);
 }
 
+function isDefaultAnalysis(analysis: WalletAnalysis): boolean {
+  return (
+    analysis.programList.length === 0 &&
+    Object.keys(analysis.programUsage).length === 0 &&
+    Object.keys(analysis.interactionTypes).length === 0 &&
+    Object.keys(analysis.categories).length === 0 &&
+    analysis.nftActivity.listings === 0 &&
+    analysis.nftActivity.purchases === 0 &&
+    analysis.lastActivityTimestamp === 0 &&
+    analysis.totalTransactions === 0
+  );
+}
+
 async function writeDescriptionsToFile(descriptions: string, walletAddress: string) {
   const fileName = `descriptions_${walletAddress}.txt`;
   const filePath = path.join(__dirname, fileName);
@@ -154,25 +167,37 @@ async function writeDescriptionsToFile(descriptions: string, walletAddress: stri
   console.log(`Descriptions written to ${fileName}`);
 }
 
-async function main() {
-//   const jsonFilename = 'transactions_D3HaM2LdkdRGZUQcFvVeaEvgC3NTPFyFXRdSeFmsT52G.json';
-//   const ownerWalletAddress = 'D3HaM2LdkdRGZUQcFvVeaEvgC3NTPFyFXRdSeFmsT52G';
-  const jsonFilename = 'transactions_8SKisd77dkXDxbHmhQbrkp6mjnKcwL5hYPqh9Yr8isvh.json';
-  const ownerWalletAddress = '8SKisd77dkXDxbHmhQbrkp6mjnKcwL5hYPqh9Yr8isvh';
-
-  try {
-    const transactions = await loadJsonFile(jsonFilename);
-    console.log(`Total transactions in JSON: ${transactions.length}`);
-
-    const [analysis, combinedDescriptions] = analyzeTransactions(transactions, ownerWalletAddress);
-    printAnalysis(analysis);
-    await createAnalyzedData(analysis);
-    await writeAnalysisToFile(analysis, ownerWalletAddress);
-    await writeDescriptionsToFile(combinedDescriptions, ownerWalletAddress);
-
-  } catch (error) {
-    console.error('Error analyzing transactions:', error);
+export async function processAnalysis(transactions: SimplifiedTransaction[], ownerWalletAddress: string): Promise<WalletAnalysis | null> {
+  const [analysis, combinedDescriptions] = analyzeTransactions(transactions, ownerWalletAddress);
+  // printAnalysis(analysis);
+  if (isDefaultAnalysis(analysis)) {
+    return null;
   }
+  await createAnalyzedData(analysis);
+  // await writeAnalysisToFile(analysis, ownerWalletAddress);
+  // await writeDescriptionsToFile(combinedDescriptions, ownerWalletAddress);
+  return analysis;
 }
 
-main();
+// async function main() {
+// //   const jsonFilename = 'transactions_D3HaM2LdkdRGZUQcFvVeaEvgC3NTPFyFXRdSeFmsT52G.json';
+// //   const ownerWalletAddress = 'D3HaM2LdkdRGZUQcFvVeaEvgC3NTPFyFXRdSeFmsT52G';
+//   const jsonFilename = 'transactions_8SKisd77dkXDxbHmhQbrkp6mjnKcwL5hYPqh9Yr8isvh.json';
+//   const ownerWalletAddress = '8SKisd77dkXDxbHmhQbrkp6mjnKcwL5hYPqh9Yr8isvh';
+
+//   try {
+//     const transactions = await loadJsonFile(jsonFilename);
+//     console.log(`Total transactions in JSON: ${transactions.length}`);
+
+//     const [analysis, combinedDescriptions] = analyzeTransactions(transactions, ownerWalletAddress);
+//     printAnalysis(analysis);
+//     await createAnalyzedData(analysis);
+//     await writeAnalysisToFile(analysis, ownerWalletAddress);
+//     await writeDescriptionsToFile(combinedDescriptions, ownerWalletAddress);
+
+//   } catch (error) {
+//     console.error('Error analyzing transactions:', error);
+//   }
+// }
+
+// main();

@@ -1,17 +1,19 @@
+import dotenv from 'dotenv';
 import Replicate from "replicate";
 
-const replicate = new Replicate();
-const REPLICATE_ENDPOINT = "stability-ai/stable-diffusion:ac732df83cea7fff18b8472768c88ad041fa750ff7682a21affe81863cbe77e4";
+dotenv.config();
 
-const replicateInput = {
-    "width": 768,
-    "height": 768,
-    "prompt": "an astronaut riding a horse on mars, hd, dramatic lighting",
-    "scheduler": "K_EULER",
-    "num_outputs": 1,
-    "guidance_scale": 7.5,
-    "num_inference_steps": 50
-};
+export async function generateImageViaDiffusion(prompt: string): Promise<string | null> {
+    const replicate = new Replicate();
+    const REPLICATE_ENDPOINT = "stability-ai/stable-diffusion:ac732df83cea7fff18b8472768c88ad041fa750ff7682a21affe81863cbe77e4";
 
-const output = await replicate.run(REPLICATE_ENDPOINT, { replicateInput });
-console.log(output)
+    const input = {
+        prompt,
+        scheduler: "K_EULER"
+    };
+    
+    const output = await replicate.run(REPLICATE_ENDPOINT, { input });
+    console.log(output)
+    return null;
+}
+
